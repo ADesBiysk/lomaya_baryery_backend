@@ -69,5 +69,5 @@ jobs:
       name: Request healthcheck endpoint
       uses: im-open/url-status-check@v1.1.0
       with:
-        url: ${{env.HEALTHCHECK_URL}}
+        url: ${{ vars.HEALTHCHECK_URL }}
         fail-on-bad-status: true
