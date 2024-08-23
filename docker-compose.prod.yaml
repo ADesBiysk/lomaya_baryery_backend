@@ -20,7 +20,7 @@ services:
       - .env
 
   backend:
-    image: ghcr.io/ades-biysk/lomaya_baryery_backend:prod
+    image: ghcr.io/adesbiysk/lomaya_baryery_backend:prod
     container_name: lomaya_baryery_backend
     restart: always
     depends_on:
