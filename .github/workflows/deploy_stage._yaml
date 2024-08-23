@@ -1,5 +1,5 @@
 name: Stage backend build and deploy
-
+# Сервер временно отключен из-за остановки активной разработки.
 on:
   pull_request:
     branches:

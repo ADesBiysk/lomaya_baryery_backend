@@ -6,14 +6,6 @@ on:
       - develop
     types: [ closed ]
 
-env:
-  REGISTRY: ghcr.io
-  REP_OWNER: studio-yandex-practicum
-  IMAGE_NAME: lomaya_baryery_backend
-  DEPLOY_PATH: /lombarye/full
-  WORK_DIR: /LOMAYA_BARYERY_BACKEND
-  HEALTHCHECK_URL: https://бот.ломаябарьеры.рф/api/healthcheck
-
 defaults:
   run:
     working-directory: .
@@ -33,7 +25,7 @@ jobs:
       - name: Docker login
         uses: docker/login-action@v1
         with:
-          registry: ${{ env.REGISTRY }}
+          registry: ${{ vars.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
@@ -45,8 +37,8 @@ jobs:
           labels: runnumber=${GITHUB_RUN_ID}
           push: true
           tags: |
-            ${{ env.REGISTRY }}/${{ env.REP_OWNER }}/${{ env.IMAGE_NAME }}:prod,
-            ${{ env.REGISTRY }}/${{ env.REP_OWNER }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+            ${{ vars.REGISTRY }}/${{ vars.REP_OWNER }}/${{ vars.IMAGE_NAME }}:prod,
+            ${{ vars.REGISTRY }}/${{ vars.REP_OWNER }}/${{ vars.IMAGE_NAME }}:${{ github.sha }}
 
   start_application:
     name: Start application
@@ -65,8 +57,9 @@ jobs:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
+          passphrase: ${{ secrets.SSH_PASSPHRASE }}
           source: "docker-compose.prod.yaml,nginx/default.prod.conf"
-          target: ${{ env.DEPLOY_PATH }}
+          target: ${{ vars.DEPLOY_PATH }}
 
       - name: Create .env file
         uses: appleboy/ssh-action@master
@@ -74,8 +67,9 @@ jobs:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
+          passphrase: ${{ secrets.SSH_PASSPHRASE }}
           script: |
-            cd ${{ env.DEPLOY_PATH }}
+            cd ${{ vars.DEPLOY_PATH }}
             mv docker-compose.prod.yaml docker-compose.yaml
             mv nginx/default.prod.conf nginx/default.conf
             rm -f .env
@@ -86,15 +80,15 @@ jobs:
             echo DB_HOST=${{ secrets.DB_HOST }} >> .env
             echo DB_PORT=${{ secrets.DB_PORT }} >> .env
             echo BOT_TOKEN=${{ secrets.TELEGRAM_BOT_TOKEN }} >> .env
-            echo BOT_WEBHOOK_MODE=${{ secrets.BOT_WEBHOOK_MODE }} >> .env
+            echo BOT_WEBHOOK_MODE=${{ vars.BOT_WEBHOOK_MODE }} >> .env
             echo APPLICATION_URL=${{ secrets.APPLICATION_URL }} >> .env
             echo HEALTHCHECK_API_URL=${{ secrets.HEALTHCHECK_API_URL }} >> .env
             echo MAIL_LOGIN=${{ secrets.MAIL_LOGIN }} >> .env
             echo MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }} >> .env
             echo ORGANIZATIONS_EMAIL=${{ secrets.ORGANIZATIONS_EMAIL }} >> .env
             echo SECRET_KEY=${{ secrets.SECRET_KEY }} >> .env
-            echo ROOT_PATH=${{ secrets.ROOT_PATH }} >> .env
-            echo TZ=${{ secrets.TZ }} >> .env
+            echo ROOT_PATH=${{ vars.ROOT_PATH }} >> .env
+            echo TZ=${{ vars.TZ }} >> .env
             echo DEBUG=${{ secrets.DEBUG }} >> .env
 
       - name: Start application
@@ -103,13 +97,14 @@ jobs:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
+          passphrase: ${{ secrets.SSH_PASSPHRASE }}
           script: |
-            cd ${{ env.DEPLOY_PATH }}
+            cd ${{ vars.DEPLOY_PATH }}
             docker image prune -f
-            docker pull  ${{ env.REGISTRY }}/${{ env.REP_OWNER }}/${{ env.IMAGE_NAME }}:prod
-            docker-compose --file docker-compose.yaml stop
-            docker-compose --file docker-compose.yaml rm backend
-            docker-compose --file docker-compose.yaml up -d
+            docker pull  ${{ vars.REGISTRY }}/${{ vars.REP_OWNER }}/${{ vars.IMAGE_NAME }}:prod
+            docker compose --file docker-compose.yaml stop
+            docker compose --file docker-compose.yaml rm backend
+            docker compose --file docker-compose.yaml up -d
 
       - name: Making migrations
         uses: appleboy/ssh-action@master
@@ -117,9 +112,10 @@ jobs:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
+          passphrase: ${{ secrets.SSH_PASSPHRASE }}
           script: |
-            cd ${{ env.DEPLOY_PATH }}
-            docker-compose exec -T -w ${{ env.WORK_DIR }} backend alembic upgrade head
+            cd ${{ vars.DEPLOY_PATH }}
+            docker compose exec -T -w ${{ vars.WORK_DIR }} backend alembic upgrade head
 
       - name: Sleep for 30 seconds
         run: sleep 30s
@@ -128,5 +124,5 @@ jobs:
       - name: Get the status of healthcheck
         uses: im-open/url-status-check@v1.1.0
         with:
-          url: ${{ env.HEALTHCHECK_URL }}
+          url: ${{ vars.HEALTHCHECK_URL }}
           fail-on-bad-status: true
