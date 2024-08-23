@@ -13,8 +13,8 @@ env:
   DB_HOST: localhost
   DB_PORT: 5432
   APPLICATION_URL: 'http://localhost:8080/'
-  HEALTHCHECK_API_URL: 'http://localhost:8080/ping'
-  HEALTHCHECK_URL: 'http://localhost:8080/healthcheck'
+  HEALTHCHECK_API_URL: 'http://localhost:8080/api/ping'
+  HEALTHCHECK_URL: 'http://localhost:8080/api/healthcheck'
 
 jobs:
   healthcheck:
@@ -69,5 +69,5 @@ jobs:
       name: Request healthcheck endpoint
       uses: im-open/url-status-check@v1.1.0
       with:
-        url: ${{ vars.HEALTHCHECK_URL }}
+        url: ${{env.HEALTHCHECK_URL}}
         fail-on-bad-status: true
