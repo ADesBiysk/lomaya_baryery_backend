@@ -59,7 +59,7 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           passphrase: ${{ secrets.SSH_PASSPHRASE }}
           source: "docker-compose.prod.yaml,nginx/default.prod.conf"
-          target: ${{ env.DEPLOY_PATH }}
+          target: ${{ vars.DEPLOY_PATH }}
 
       - name: Create .env file
         uses: appleboy/ssh-action@master
@@ -69,7 +69,7 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           passphrase: ${{ secrets.SSH_PASSPHRASE }}
           script: |
-            cd ${{ env.DEPLOY_PATH }}
+            cd ${{ vars.DEPLOY_PATH }}
             mv docker-compose.prod.yaml docker-compose.yaml
             mv nginx/default.prod.conf nginx/default.conf
             rm -f .env
