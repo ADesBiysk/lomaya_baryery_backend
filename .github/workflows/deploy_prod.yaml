@@ -37,8 +37,8 @@ jobs:
           labels: runnumber=${GITHUB_RUN_ID}
           push: true
           tags: |
-            ${{ vars.REGISTRY }}/${{ vars.REP_OWNER }}/${{ vars.IMAGE_NAME }}:prod,
-            ${{ vars.REGISTRY }}/${{ vars.REP_OWNER }}/${{ vars.IMAGE_NAME }}:${{ github.sha }}
+            ${{ vars.REGISTRY }}/${{ github.repository_owner }}/${{ vars.IMAGE_NAME }}:prod,
+            ${{ vars.REGISTRY }}/${{ github.repository_owner }}/${{ vars.IMAGE_NAME }}:${{ github.sha }}
 
   start_application:
     name: Start application
