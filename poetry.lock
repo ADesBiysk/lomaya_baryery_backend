@@ -2261,6 +2261,7 @@ files = [
 idna = ">=2.0"
 multidict = ">=4.0"
 
+
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
