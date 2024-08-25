@@ -2319,6 +2319,7 @@ files = [
     {file = "yarl-1.8.2.tar.gz", hash = "sha256:49d43402c6e3013ad0978602bf6bf5328535c48d192304b91b97a3c6790b1562"},
 ]
 
+
 [package.dependencies]
 idna = ">=2.0"
 multidict = ">=4.0"
