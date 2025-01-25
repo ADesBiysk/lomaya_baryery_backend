@@ -38,3 +38,6 @@ jobs:
 
       - name: Check Migrations
         run: poetry run alembic-autogen-check --config ./alembic.ini
+
+      - name: Make testing
+        run: poetry run pytest
