@@ -91,22 +91,22 @@ class Shift(Base):
         order_by="Member.member_user_name",
     )
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"<Shift: {self.id}, status: {self.status}>"
 
-    async def start(self):
+    async def start(self) -> None:
         if self.status != Shift.Status.PREPARING.value:
             raise exceptions.ShiftStartError(self)
         self.status = Shift.Status.STARTED.value
         self.started_at = dt.datetime.now().date()
 
-    async def finish(self):
+    async def finish(self) -> None:
         if self.status != Shift.Status.STARTED.value:
             raise exceptions.ShiftFinishError(self)
         self.status = Shift.Status.FINISHED.value
         self.finished_at = dt.datetime.now().date()
 
-    async def cancel(self, final_message: str):
+    async def cancel(self, final_message: str) -> None:
         if self.status != Shift.Status.PREPARING.value:
             raise exceptions.ShiftCancelError(self)
         self.final_message = final_message
@@ -142,7 +142,7 @@ class Task(Base):
         back_populates="task",
     )
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"<Task: {self.id}, title: {self.title}>"
 
 
@@ -199,7 +199,7 @@ class User(Base):
         back_populates="user",
     )
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"<User: {self.id}, name: {self.name}, surname: {self.surname}>"
 
 
@@ -245,7 +245,7 @@ class Request(Base):
         back_populates="requests",
     )
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"<Request: {self.id}, status: {self.status}>"
 
 
@@ -277,7 +277,7 @@ class Member(Base):
         ),
         default=Status.ACTIVE.value,
     )
-    member_user_name = deferred(
+    member_user_name: Mapped[list[User]] = deferred(
         (sa.select(User.name).where(User.id == user_id)).scalar_subquery(),
     )
 
@@ -303,7 +303,7 @@ class Member(Base):
         ),
     )
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"<Member: {self.id}, status: {self.status}>"
 
 
@@ -436,10 +436,10 @@ class Report(Base):
         ),
     )
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"<Report: {self.id}, task_date: {self.task_date}, status: {self.status}>"
 
-    def send_report(self, photo_url: str):
+    def send_report(self, photo_url: str) -> None:
         if self.number_attempt == settings.NUMBER_ATTEMPTS_SUBMIT_REPORT:
             raise exceptions.ExceededAttemptsReportError
         if not photo_url:
@@ -454,7 +454,7 @@ class Report(Base):
         self.uploaded_at = dt.datetime.now()
         self.number_attempt += 1
 
-    def set_reviewer(self, administrator_id: UUID):
+    def set_reviewer(self, administrator_id: UUID) -> None:
         """Установить администратора, который проверил отчет и дату проверки."""
         self.updated_by = administrator_id
         self.reviewed_at = dt.datetime.now()
