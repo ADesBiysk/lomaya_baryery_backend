@@ -73,7 +73,7 @@ class Shift(Base):
         server_default=sa.func.current_timestamp(),  # TODO: Проверить необходимость значения по умолчанию
         index=True,
     )
-    finished_at: Mapped[str] = mapped_column(
+    finished_at: Mapped[dt.date] = mapped_column(
         index=True,
     )
 
@@ -97,20 +97,20 @@ class Shift(Base):
     async def start(self) -> None:
         if self.status != Shift.Status.PREPARING.value:
             raise exceptions.ShiftStartError(self)
-        self.status = Shift.Status.STARTED.value
+        self.status = Shift.Status.STARTED
         self.started_at = dt.datetime.now().date()
 
     async def finish(self) -> None:
         if self.status != Shift.Status.STARTED.value:
             raise exceptions.ShiftFinishError(self)
-        self.status = Shift.Status.FINISHED.value
+        self.status = Shift.Status.FINISHED
         self.finished_at = dt.datetime.now().date()
 
     async def cancel(self, final_message: str) -> None:
         if self.status != Shift.Status.PREPARING.value:
             raise exceptions.ShiftCancelError(self)
         self.final_message = final_message
-        self.status = Shift.Status.CANCELLED.value
+        self.status = Shift.Status.CANCELLED
         self.finished_at = dt.datetime.now().date()
 
 
@@ -449,7 +449,7 @@ class Report(Base):
             Report.Status.DECLINED.value,
         ):
             raise exceptions.CannotAcceptReportError
-        self.status = Report.Status.REVIEWING.value
+        self.status = Report.Status.REVIEWING
         self.report_url = photo_url
         self.uploaded_at = dt.datetime.now()
         self.number_attempt += 1
