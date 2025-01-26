@@ -311,7 +311,7 @@ class Administrator(Base):
     """Модель администратора смены."""
 
     class Status(str, enum.Enum):
-        """Cтатус администратора."""
+        """Статус администратора."""
 
         ACTIVE = "active"
         BLOCKED = "blocked"
@@ -454,7 +454,7 @@ class Report(Base):
         self.uploaded_at = dt.datetime.now()
         self.number_attempt += 1
 
-    def set_reviewer(self, administrator_id: UUID) -> None:
+    def set_reviewer(self, administrator_id: uuid.UUID) -> None:
         """Установить администратора, который проверил отчет и дату проверки."""
         self.updated_by = administrator_id
         self.reviewed_at = dt.datetime.now()
